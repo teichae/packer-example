@@ -1,0 +1,47 @@
+- name: Python Install
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Python Install
+      raw: apt-get -y update && apt-get install -y python3 python3-apt
+
+- name: Build Container Image
+  hosts: all
+
+  tasks:
+    - name: Creating Workdir
+      file:
+        path: /data
+        state: directory
+        owner: root
+        group: root
+        mode: 0755
+
+    - name: Installing Applications
+      apt:
+        name: nginx, tzdata
+        state: present
+
+    - name: set timezone
+      timezone:
+        name: Asia/Seoul
+
+    - name: Add Entrypoints shell
+      copy:
+        src: config/{{ item }}
+        dest: /usr/local/bin/{{ item }}
+        mode: 0755
+        owner: root
+        group: root
+      with_items:
+        - docker-entrypoint.sh
+
+- name: Container Cleanup
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Remove Python
+      raw: apt-get purge -y python3 python3-apt && apt-get autoremove -y
+
+    - name: Remove Apt Lists
+      raw: rm -rf /var/lib/apt/lists/*

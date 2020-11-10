@@ -1,0 +1,36 @@
+{
+  "variables": {
+        "dockerhub_username": "teichae",
+        "dockerhub_password": "password"
+  },
+  "builders": [{
+        "type": "docker",
+        "image": "ubuntu:18.04",
+        "commit": true,
+        "changes": [
+            "VOLUME /data",
+            "WORKDIR /data",
+            "EXPOSE 80",
+            "ENTRYPOINT [\"docker-entrypoint.sh\"]"
+        ]
+    }],
+    "provisioners": [{
+        "type": "ansible",
+        "user": "root",
+        "playbook_file": "provision.yml"
+    }],
+    "post-processors": [[{
+        "type": "docker-tag",
+        "repository": "teichae/packer-nginx",
+        "tag": "latest"
+    },
+    {
+        "type": "docker-push",
+        "login": "true",
+        "login_username": "{{user `dockerhub_username`}}",
+        "login_password": "{{user `dockerhub_password`}}"
+    }
+  ]
+ ]
+}
+
