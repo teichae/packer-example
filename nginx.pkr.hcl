@@ -24,7 +24,7 @@ build {
   post-processors {
     post-processor "docker-tag" {
       repository = "teichae/packer-nginx"
-      tag        = ["latest"]
+      tags       = ["latest"]
     }
     post-processor "docker-push" {
       login          = "true"
